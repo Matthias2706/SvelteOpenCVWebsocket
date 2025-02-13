@@ -28,13 +28,56 @@
  */
 
 #include <drogon/drogon.h>
+#include <opencv2/opencv.hpp>
+#include "WebSocketController.h"
 
 int main()
 {
-    drogon::app()
-        .addListener("0.0.0.0", 80)
-        .loadConfigFile("./drogon.json")
-        .run();
+    // Start webserver in thread
+    std::thread t([] {
+        drogon::app()
+            .addListener("0.0.0.0", 80)
+            .loadConfigFile("./drogon.json")
+            .run();
+        });
+
+    // Start cam
+    cv::VideoCapture vc(0, cv::CAP_DSHOW);
+    
+    if (vc.isOpened())
+    {
+        while (true)
+        {
+            cv::Mat imgCap;
+            vc >> imgCap;
+
+            if (!imgCap.empty())
+            {
+                std::vector<uchar> buf;
+                cv::imencode(".jpg", imgCap, buf);
+                auto base64 = base64_encode(std::string(buf.begin(), buf.end()));
+
+                auto ccIds = WebSocketController::getInstance()->getConnectedClientIds();
+                // Send images to all connected clients
+                for (auto ccId : ccIds)
+                {
+                    auto cc = WebSocketController::getInstance()->getConnectedClient(ccId);
+                    if (cc != nullptr)
+                        cc->send(base64);
+                }
+            }
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
+    }
+
+    // Stop cam
+    vc.release();
+
+    // Stop webserver
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    drogon::app().quit();
+    t.join();
 
 	return 0;
 }

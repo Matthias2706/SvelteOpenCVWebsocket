@@ -1,7 +1,12 @@
 {
   "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
   "dependencies": [
-    "drogon",
+    {
+      "name": "drogon",
+      "features": [
+        "ctl"
+      ]
+    },
     "jsoncpp",
     "opencv"
   ],

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <drogon/WebSocketController.h>
-
 #include <opencv2/opencv.hpp>
 #include "base64.h"
 

@@ -1,5 +1,4 @@
 #include "WebSocketController.h"
-#include "SharedData.h"
 
 WebSocketController* pInstance = nullptr;
 
