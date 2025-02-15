@@ -1,47 +1,61 @@
 <script lang="ts">
 
     import { onMount } from "svelte";
-    import { slide,fade } from 'svelte/transition';
+    import { fade } from 'svelte/transition';
 
     let frameCount:number = $state(0);
     let src:string = $state("");
+    let socket:WebSocket|any = undefined;
 
-    let socket:WebSocket;
+	onMount(() => {
+		const interval = setInterval(() => {
 
-    onMount(() => {
-        socket = new WebSocket("ws://localhost:80/camera/stream")
-        socket.addEventListener("open", ()=> {
-            console.log("Opened")
-        })
+            if(socket == undefined)
+            {
+                console.log("try connect");
+                socket = new WebSocket("ws://localhost:80/camera/stream");
 
-        socket.addEventListener("message", (message: any) => {    
-            frameCount++
-            let imgData = "data:image/jpg;base64," + message.data;
-            src = imgData;
+                socket.addEventListener("message", (message: any) => {    
+                    frameCount++
+                    let imgData = "data:image/jpg;base64," + message.data;
+                    src = imgData;
+                    return false;
+                });
 
-            return false;
-        });
+                socket.addEventListener("error", ()=> {
+                    if(socket != undefined)
+                        socket.close();
+                    socket = undefined;
+                });
 
-        socket.addEventListener("close", (event: any) => {    
-            console.log(event);
-            src = "";
-        });
+                socket.addEventListener("close", (event: any) => {    
+                    socket = undefined;
+                    src = "";
+                });
+            }
 
-        return ()=>{
-            socket.close();
+		}, 1000);
+
+		return () => {
+            clearInterval(interval)
+            if(socket != undefined)
+                socket.close();
+            socket = undefined;
         };
-    });
+	});
 
     function handleOnLoad()
     {
-        width = img.width;
-        height = img.height;
+        if(img != null)
+        {
+            width = img.naturalWidth;
+            height = img.naturalHeight;
+        }
     }
 
     let width:number= $state(0);
     let height:number= $state(0);
-    let img:HTMLImageElement;
-
+    let img:HTMLImageElement | null = $state(null);
 </script>
 
 <div class="grid h-dvh place-content-center drop-shadow-xl">
@@ -50,7 +64,7 @@
     {#if src.length > 0}
         <img bind:this={img} {src} class="bg-black" alt="Webcam" onload={handleOnLoad} transition:fade>
     {:else}
-        <p>Loading stream...</p>
+        <p class="p-2 grid place-content-center">Loading stream...</p>
     {/if}
     <div class="p-1 rounded-b-lg bg-sky-600 text-white border-t-1">
         <p class="px-3">Frame count: {frameCount}</p>

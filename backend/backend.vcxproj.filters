@@ -24,6 +24,9 @@
     <ClCompile Include="base64.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="FilterBlur.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="vcpkg.json" />
@@ -34,6 +37,9 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="base64.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="FilterBlur.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
