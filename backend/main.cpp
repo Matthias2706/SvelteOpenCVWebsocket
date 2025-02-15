@@ -51,7 +51,7 @@ int main()
     // Start cam
     cv::VideoCapture vc(0, cv::CAP_DSHOW);
     
-    FilterBlur* fb = new FilterBlur("human.onnx");
+    FilterBlur* fb = new FilterBlur("assets/human.onnx");
 
     if (vc.isOpened())
     {
@@ -63,7 +63,7 @@ int main()
             if (!imgCap.empty())
             {
 
-                cv::Mat out = fb->run(imgCap);
+                imgCap = fb->run(imgCap);
 
                 std::vector<uchar> buf;
                 cv::imencode(".jpg", imgCap, buf);

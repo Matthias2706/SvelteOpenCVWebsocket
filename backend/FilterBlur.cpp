@@ -88,8 +88,6 @@ cv::Mat FilterBlur::run(const cv::Mat& inputImage) {
     cv::Mat imgCap = inputImage.clone();
 
     // Resize auf NET_WIDTH x NET_HEIGHT
-    cv::resize(imgCap, imgCap, cv::Size(NET_WIDTH, NET_HEIGHT));
-
     cv::Mat netInputImg;
     cv::Vec4d params;
     LetterBox(imgCap, netInputImg, params, cv::Size(NET_WIDTH, NET_HEIGHT));
